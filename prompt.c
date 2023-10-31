@@ -2,16 +2,16 @@
 void prompt(char **av, char **env)
 {
 	char *string = NULL;
-	int i, status;
+	int i, j, status;
 	size_t n = 0;
 	ssize_t num_char;
-	char *argv[] = {NULL, NULL};
+	char *argv[FUNCTION_H];
 	pid_t child_pid;
 
 	while (1)
 	{
+		if(isatty(STDIN_FILENO))
 		printf("Shell$ ");
-
 		num_char = getline(&string, &n, stdin);
 		if (num_char == -1)
 		{
@@ -19,13 +19,18 @@ void prompt(char **av, char **env)
 			exit(EXIT_FAILURE);
 		}
 		i = 0;
-
 		while(string[i])
 		{
 			if (string[i] == '\n')
 				string[i] = 0;
+			i++;
 		}
-		argv[0] = string;
+		j = 0;
+		argv[j] = strtok(string, " ");
+		while(argv[j])
+		{
+			argv[++j] = strtok(NULL, " ");
+		}
 		child_pid = fork();
 
 		if (child_pid == -1)
