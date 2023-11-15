@@ -1,4 +1,4 @@
-#ifndef FUNCT_H
+#ifndef FUNCTION_H
 #define FUNCTION_H 102
 
 #include <stdio.h>

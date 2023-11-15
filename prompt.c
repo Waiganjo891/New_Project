@@ -1,4 +1,9 @@
 #include "shell.h"
+/**
+ * prompt - A void
+ * @av: A character
+ * @env: Another character
+ */
 void prompt(char **av, char **env)
 {
 	char *string = NULL;
@@ -19,50 +24,57 @@ void prompt(char **av, char **env)
 			exit(EXIT_FAILURE);
 		}
 		i = 0;
-        while (string[i])
-        {
-            if (string[i] == '\n')
-                string[i] = 0;
-            i++;
-        }
-        j = 0;
-        argv[j] = strtok(string, " ");
-        while (argv[j])
-        {
-            argv[++j] = strtok(NULL, " ");
-        }
-	if (strcmp(argv[0], "env") == 0)
-	{
-		a = 0;
-		while (env[a] != NULL)
+		while (string[i])
 		{
-			printf("%s\n", env[a]);
-			a++;
+			if (string[i] == '\n')
+				string[i] = 0;
+			i++;
 		}
+		j = 0;
+		argv[j] = strtok(string, " ");
+		if (argv[j] == NULL)
+		{
+			continue;
+		}
+		while (argv[j])
+		{
+			argv[++j] = strtok(NULL, " ");
+		}
+		if (strcmp(argv[0], "exit") == 0)
+		{
+			status = argv[1] ? atoi(argv[1]) : EXIT_SUCCESS;
+			free(string);
+			exit(status);
+		}
+		else if (strcmp(argv[0], "env") == 0)
+		{
+			a = 0;
+			while (env[a] != NULL)
+			{
+				printf("%s\n", env[a]);
+				a++;
+			}
+		}
+		else if (access(argv[0], X_OK) == 0)
+		{
+			child_pid = fork();
+			if (child_pid == -1)
+			{
+				free(string);
+				exit(EXIT_FAILURE);
+			}
+			if (child_pid == 0)
+			{
+				if (execve(argv[0], argv, env) == -1)
+				{
+					perror("execve");
+					exit(EXIT_FAILURE);
+				}
+			}
+			else
+				wait(&status);
+		}
+		else
+			printf("%s: No such file or directory\n", av[0]);
 	}
-	else if (access(argv[0], X_OK) == 0)
-        {
-            child_pid = fork();
-
-            if (child_pid == -1)
-            {
-                free(string);
-                exit(EXIT_FAILURE);
-            }
-            if (child_pid == 0)
-            {
-                if (execve(argv[0], argv, env) == -1)
-                {
-                    perror("execve");
-                    exit(EXIT_FAILURE);
-                }
-            }
-            else
-                wait(&status);
-	} 
-        else
-        {
-            printf("%s: No such file or directory\n", av[0]);
-        }
-    }
 }
