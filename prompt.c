@@ -1,24 +1,24 @@
 #include "shell.h"
 void prompt(char **av, char **env)
 {
-    char *string = NULL;
-    int i, j, status;
-    size_t n = 0;
-    ssize_t num_char;
-    char *argv[FUNCTION_H];
-    pid_t child_pid;
+	char *string = NULL;
+	int i, j, a, status;
+	size_t n = 0;
+	ssize_t num_char;
+	char *argv[FUNCTION_H];
+	pid_t child_pid;
 
-    while (1)
-    {
-        if (isatty(STDIN_FILENO))
-            printf("Shell$ ");
-        num_char = getline(&string, &n, stdin);
-        if (num_char == -1)
-        {
-            free(string);
-            exit(EXIT_FAILURE);
-        }
-        i = 0;
+	while (1)
+	{
+		if (isatty(STDIN_FILENO))
+			printf("Shell$ ");
+		num_char = getline(&string, &n, stdin);
+		if (num_char == -1)
+		{
+			free(string);
+			exit(EXIT_FAILURE);
+		}
+		i = 0;
         while (string[i])
         {
             if (string[i] == '\n')
@@ -31,7 +31,16 @@ void prompt(char **av, char **env)
         {
             argv[++j] = strtok(NULL, " ");
         }
-        if (access(argv[0], X_OK) == 0)
+	if (strcmp(argv[0], "env") == 0)
+	{
+		a = 0;
+		while (env[a] != NULL)
+		{
+			printf("%s\n", env[a]);
+			a++;
+		}
+	}
+	else if (access(argv[0], X_OK) == 0)
         {
             child_pid = fork();
 
@@ -50,7 +59,7 @@ void prompt(char **av, char **env)
             }
             else
                 wait(&status);
-        }
+	} 
         else
         {
             printf("%s: No such file or directory\n", av[0]);
