@@ -1,39 +1,22 @@
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
-#include <unistd.h>
-
-extern char **environ;
+#include <string.h>
 
 int main()
 {
-	char *line = NULL;
-	size_t len = 0;
-	ssize_t read;
-	char *word;
+	char *buffer;
+	size_t bufsize = 1024;
 
-	while (1)
+	buffer = (char *)malloc(bufsize * sizeof(char));
+	if (buffer == NULL)
 	{
-		if (isatty(STDIN_FILENO))
-			printf("$ ");
-		read = getline(&line, &len, stdin);
-		if (read == -1 || read == EOF)
-		{
-			break;
-		}
-
-		word = strtok(line, " ");
-		if (word != NULL)
-		{
-			word[strcspn(word, "\n")] = '\0';
-			char *argv[] = {word, NULL};
-
-			if (execve(word, argv, environ) == -1)
-			{
-				perror("execve");
-			}
-		}
+		perror("Unable to allocate buffer");
+		exit(1);
 	}
-	free(line);
+	printf("$ ");
+	getline(&buffer, &bufsize, stdin);
+	buffer[strcspn(buffer, "\n")] = 0;
+	printf("%s\n", buffer);
+	free(buffer);
 	return (0);
 }
