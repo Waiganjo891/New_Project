@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+extern char **environ;
+
 int main()
 {
 	char *line = NULL;
@@ -21,10 +23,15 @@ int main()
 		}
 
 		word = strtok(line, " ");
-		while (word != NULL)
+		if (word != NULL)
 		{
-			printf("%s\n", word);
-			word = strtok(NULL, " ");
+			word[strcspn(word, "\n")] = '\0';
+			char *argv[] = {word, NULL};
+
+			if (execve(word, argv, environ) == -1)
+			{
+				perror("execve");
+			}
 		}
 	}
 	free(line);
