@@ -39,6 +39,11 @@ void prompt(char **av, char **env)
 		{
 			argv[++j] = strtok(NULL, " ");
 		}
+		if (access(argv[0], X_OK) == -1)
+		{
+			printf("%s: No such file or directory\n", argv[0]);
+			continue;
+		}
 		child_pid = fork();
 		if (child_pid == -1)
 		{
