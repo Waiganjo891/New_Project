@@ -9,10 +9,10 @@
 
 void prompt(char **av, char **env)
 {
-	char *string = NULL;
+	char *line = NULL;
 	int i, j, status;
-	size_t n = 0;
-	ssize_t num_char;
+	size_t len = 0;
+	ssize_t read;
 	char *argv[MAX_COMMAND];
 	pid_t child_pid;
 
@@ -20,21 +20,21 @@ void prompt(char **av, char **env)
 	{
 		if (isatty(STDIN_FILENO))
 			printf("$ ");
-		num_char = getline(&string, &n, stdin);
-		if (num_char == -1 || num_char == EOF)
+		read = getline(&line, &len, stdin);
+		if (read == -1)
 		{
-			free(string);
-			break;
+			free(line);
+			exit(EXIT_FAILURE);
 		}
 		i = 0;
-		while (string[i])
+		while (line[i])
 		{
-			if (string[i] == '\n')
-				string[i] = 0;
+			if (line[i] == '\n')
+				line[i] = 0;
 			i++;
 		}
 		j = 0;
-		argv[j] = strtok(string, " ");
+		argv[j] = strtok(line, " ");
 		while (argv[j])
 		{
 			argv[++j] = strtok(NULL, " ");
@@ -42,7 +42,7 @@ void prompt(char **av, char **env)
 		child_pid = fork();
 		if (child_pid == -1)
 		{
-			free(string);
+			free(line);
 			exit(EXIT_FAILURE);
 		}
 		else if (child_pid == 0)
@@ -56,7 +56,7 @@ void prompt(char **av, char **env)
 		{
 			wait(&status);
 		}
-	};
+	}
 }
 
 int main(int ac, char **av, char **env)
