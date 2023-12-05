@@ -10,7 +10,7 @@
 void prompt(char **av, char **env)
 {
 	char *line = NULL;
-	int i, j, status;
+	int i, a, j, status;
 	size_t len = 0;
 	ssize_t read;
 	char *argv[MAX_COMMAND];
@@ -32,6 +32,20 @@ void prompt(char **av, char **env)
 			if (line[i] == '\n')
 				line[i] = 0;
 			i++;
+		}
+		if (strcmp(line, "exit") == 0)
+		{
+			break;
+		}
+		else if (strcmp(line, "env") == 0)
+		{
+			a = 0;
+			while (env[a] != NULL)
+			{
+				printf("%s\n", env[a]);
+				a++;
+			}
+			continue;
 		}
 		j = 0;
 		argv[j] = strtok(line, " ");
